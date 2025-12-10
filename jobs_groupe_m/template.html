@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="30">
     <title>Config machine</title>
     <link rel="stylesheet" href="template.css">
 </head>
 <body>
     <header>
-        <h1> configuaraion PC de {{name_pc}}, {{timestamp}}  </h1>
+        <h1> configuration PC de {{name_pc}}, {{timestamp}}  </h1>
     </header>
     <main>
         <section class="Système">
@@ -16,6 +17,7 @@
             <p>le système d'exploitation : {{name_systeme}}</p>
             <p>uptime : {{uptime}} </p>
             <p>nombre utilisateur : {{user_nomber}} </p>
+            <p>charge système moyenne : {{system_load}}</p>
         </section>
         <section class="cpu">
             <h2>le cpu</h2>
@@ -27,7 +29,10 @@
             <h2>Mémoire</h2>
             <p>RAM totale : {{total_memory}}</p>
             <p>RAM utilisée : {{used_memory}}</p>
-            <p>RAM disponible : {{available_memory}}</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="ram-progress"></div>
+            </div>
+            <p class="progress-label"><span id="ram-percent">{{ram_percentage}}</span>% utilisé</p>
         </section>
         <section class="Réseau">
             <h2>Réseau</h2>
@@ -46,5 +51,30 @@
 
     <footer>
         <p>Généré le {{timestamp}}</p>
+    </footer>
+    <script>
+        // Update RAM progress bar with dynamic color coding
+        function updateRamProgress() {
+            const ramPercent = document.getElementById('ram-percent');
+            const ramProgress = document.getElementById('ram-progress');
+            if (ramPercent && ramProgress) {
+                const value = parseInt(ramPercent.textContent) || 0;
+                ramProgress.style.width = value + '%';
+                
+                // Apply color class based on usage level
+                ramProgress.classList.remove('green', 'orange', 'red');
+                if (value <= 50) {
+                    ramProgress.classList.add('green');
+                } else if (value <= 80) {
+                    ramProgress.classList.add('orange');
+                } else {
+                    ramProgress.classList.add('red');
+                }
+            }
+        }
+        // Run on page load and every refresh
+        document.addEventListener('DOMContentLoaded', updateRamProgress);
+        updateRamProgress();
+    </script>
 </body>
 </html>
