@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5">
+    <title>Config machine</title>
+    <link rel="stylesheet" href="monitoring_fixed_css.css">
+</head>
+<body>
+    <header>
+        <h1> configuration PC de {{name_pc}}, {{timestamp}}  </h1>
+    </header>
+    <main>
+        <section class="Système">
+            <h2>Système</h2>
+            <p>le système d'exploitation : {{name_systeme}}</p>
+            <p>uptime : {{uptime}} </p>
+            <p>nombre utilisateur : {{user_nomber}} </p>
+            <p>charge système moyenne : {{system_load}}</p>
+        </section>
+        <section class="cpu">
+            <h2>le cpu</h2>
+ <div class="cpu-gauge" style="--cpu: {{cpu_percent}}">
+    <div class="cpu-gauge-inner">{{cpu_percent}}%</div>
+</div>
+
+            <p>le nombre de coeur : {{cpu_count}}</p>
+            <p>la fréquence : {{frequency}}</p>
+            <p>le pourcentage d'utilisation : {{cpu_percent}} </p>
+        </section>
+        <section class="Mémoire">
+            <h2>Mémoire</h2>
+            
+            <p>RAM totale : {{total_memory}}</p>
+            <p>RAM utilisée : {{used_memory}}</p>
+            <div class="ram-bar" style="--ram: {{ram_percentage}}">
+    <div class="ram-fill"></div>
+</div>
+<p class="progress-label">{{ram_percentage}}% utilisé</p>
+
+        </section>
+        <section class="Réseau">
+            <h2>Réseau</h2>
+            <p>Adresse IP : {{ip_address}}</p>
+        </section>
+        <section class="processus">
+            <h2>Processus</h2>
+            <p>Nombre de processus en cours d'exécution : {{process_count}}</p>
+            <p>top 3 des processus par utilisation CPU : {{top_3_processes}}</p>
+        </section>
+        <section class="fichiers">
+            <h2>Fichiers</h2>
+            <p>statistique sur les fichiers:{{pourcentage}}</p>
+        </section>
+    </main>
+
+    <footer>
+        <p>Généré le {{timestamp}}</p>
+    </footer>
+
+</body>
+</html>

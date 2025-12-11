@@ -1,0 +1,363 @@
+/**
+ * MONITORING SYSTÈME - CSS COMPLET
+ * Design moderne avec jauge CPU dynamique
+ */
+
+/* ========================================
+   VARIABLES CSS
+   ======================================== */
+:root {
+    --bg: #f6f8fb;
+    --card: #ffffff;
+    --muted: #6b7280;
+    --accent: #2563eb;
+    --accent-2: #06b6d4;
+    --border: #e6e9ef;
+    --radius: 10px;
+    --max-width: 1100px;
+    --gap: 1rem;
+    --font-sans: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* ========================================
+   RESET ET BASE
+   ======================================== */
+* { 
+    box-sizing: border-box; 
+}
+
+html, body { 
+    height: 100%; 
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: linear-gradient(180deg, var(--bg), #eef2f8 120%);
+    color: #111827;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 2rem 1rem;
+    line-height: 1.6;
+}
+
+/* ========================================
+   HEADER
+   ======================================== */
+header {
+    max-width: var(--max-width);
+    margin: 0 auto 1.5rem auto;
+    padding: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 18px rgba(16, 24, 40, 0.04);
+    text-align: center;
+}
+
+header h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.5rem;
+    color: #0f172a;
+    background: linear-gradient(90deg, rgba(37,99,235,0.08), rgba(6,182,212,0.06));
+    display: inline-block;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+}
+
+.timestamp {
+    margin: 0.5rem 0 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-style: italic;
+}
+
+/* ========================================
+   MAIN GRID
+   ======================================== */
+main {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: var(--gap);
+    align-items: start;
+}
+
+/* ========================================
+   SECTIONS (CARTES)
+   ======================================== */
+section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem;
+    box-shadow: 0 6px 18px rgba(16,24,40,0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+section:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(16, 24, 40, 0.08);
+}
+
+section h2 {
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    color: #0b1220;
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 0.5rem;
+}
+
+section h3 {
+    margin: 1rem 0 0.5rem 0;
+    font-size: 0.9rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+section p {
+    margin: 0.5rem 0;
+    color: #22303f;
+    font-size: 0.95rem;
+}
+
+section pre {
+    margin: 0.5rem 0;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #334155;
+    line-height: 1.6;
+}
+
+/* Couleurs par section */
+.Système h2 { color: #8b5cf6; border-color: #8b5cf6; }
+.cpu h2 { color: var(--accent); border-color: var(--accent); }
+.Mémoire h2 { color: #0ea5a4; border-color: #0ea5a4; }
+.Réseau h2 { color: #f59e0b; border-color: #f59e0b; }
+.processus h2 { color: #ec4899; border-color: #ec4899; }
+.fichiers h2 { color: #10b981; border-color: #10b981; }
+
+/* ========================================
+   JAUGE CPU DYNAMIQUE (CSS uniquement)
+   ======================================== */
+/* Dégradé de couleur selon le niveau CPU */
+.cpu-gauge {
+    --cpu: 0;
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Choix automatique de la couleur */
+    --color: calc(var(--cpu)) ;
+    background:
+        conic-gradient(
+            /* Couleur dynamique */
+            hsl(
+                calc(120 - (var(--cpu) * 1.2)),
+                80%,
+                50%
+            )
+            calc(var(--cpu) * 1%),
+            #e5e7eb 0
+        );
+}
+
+.cpu-gauge-inner {
+    width: 100px;
+    height: 100px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.4rem;
+}
+
+
+
+/* ========================================
+   BARRE DE PROGRESSION RAM
+   ======================================== */
+.ram-bar {
+    width: 100%;
+    height: 24px;
+    background: #e6e9ef;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #cfd4dd;
+    margin: 1rem 0 0.5rem 0;
+    position: relative;
+}
+
+.ram-fill {
+    height: 100%;
+    width: calc(var(--ram) * 1%);
+    background: hsl(
+        calc(120 - (var(--ram) * 1.2)),
+        80%,
+        50%
+    );
+    transition: width 0.4s ease, background-color 0.3s ease;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 24px;
+    background: #e6e9ef;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin: 1rem 0 0.5rem 0;
+    border: 1px solid var(--border);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f9e2b9, #ed0606);
+    transition: width 0.3s ease;
+    border-radius: var(--radius);
+}
+
+.progress-label {
+    font-size: 0.9rem;
+    color: #0ea5a4;
+    font-weight: 600;
+    text-align: center;
+    margin: 0.5rem 0 0 0;
+}
+
+/* ========================================
+   FOOTER
+   ======================================== */
+footer {
+    max-width: var(--max-width);
+    margin: 1.5rem auto 0 auto;
+    padding: 1rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+footer p {
+    margin: 0.25rem 0;
+}
+
+/* ========================================
+   RESPONSIVE - TABLETTES
+   ======================================== */
+@media (max-width: 768px) {
+    body {
+        padding: 1rem 0.5rem;
+    }
+    
+    main {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    section {
+        padding: 1rem;
+    }
+    
+    .cpu-gauge {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .cpu-gauge-inner {
+        width: 85px;
+        height: 85px;
+        font-size: 1.2rem;
+    }
+}
+
+/* ========================================
+   RESPONSIVE - MOBILES
+   ======================================== */
+@media (max-width: 520px) {
+    header h1 { 
+        font-size: 1.2rem;
+        padding: 0.4rem 0.6rem;
+    }
+    
+    body { 
+        padding: 1rem 0.5rem; 
+    }
+    
+    section h2 {
+        font-size: 1rem;
+    }
+    
+    section p,
+    section pre {
+        font-size: 0.85rem;
+    }
+    
+    .cpu-gauge {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .cpu-gauge-inner {
+        width: 70px;
+        height: 70px;
+        font-size: 1rem;
+    }
+}
+
+/* ========================================
+   MODE IMPRESSION
+   ======================================== */
+@media print {
+    body { 
+        background: white; 
+        color: black;
+        padding: 0;
+    }
+    
+    header h1 { 
+        background: none; 
+        border: none; 
+    }
+    
+    section { 
+        box-shadow: none; 
+        border: 1px solid #ddd;
+        page-break-inside: avoid;
+    }
+    
+    section:hover {
+        transform: none;
+        box-shadow: none;
+    }
+    
+    .cpu-gauge {
+        box-shadow: none;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITÉ
+   ======================================== */
+:focus {
+    outline: 3px solid rgba(37, 99, 235, 0.4);
+    outline-offset: 2px;
+}
+
+:focus:not(:focus-visible) {
+    outline: none;
+}
