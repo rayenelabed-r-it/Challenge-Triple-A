@@ -40,7 +40,20 @@ def get_memory_info():
 def get_system_info():
     """Récupère les informations système générales"""
     hostname = socket.gethostname()
-    os_info = f"{platform.system()} {platform.release()}"
+    system = platform.system()
+    if system == "Linux":
+        # Essayer de récupérer la distribution Linux
+        try:
+            import distro
+            os_info = f"{distro.name()} {distro.version()}"
+        except ImportError:
+            try:
+                os_name = platform.freedesktop_os_release()
+                os_info= f"{os_name.get('NAME', 'Linux')} {os_name.get('VERSION', platform.release())}"
+            except:
+                os_info = f"Linux {platform.release()}"
+    else:
+        os_info = f"{system} {platform.release()}"
     
     # Calcul de l'uptime
     boot_time = datetime.fromtimestamp(psutil.boot_time())
