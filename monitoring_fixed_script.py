@@ -66,17 +66,22 @@ def get_system_info():
     # Nombre d'utilisateurs
     users = psutil.users()
     user_count = len(users)
-    # Afficher chaque utilisateur
-    for user in utilisateurs:
-        # Si .host existe et n'est pas vide, l'afficher, sinon afficher "local"
-        origine = user.host if user.host else "local"
-        print(f"  → {user.name} (depuis {origine})")
-    hostname=socket.gethostname()
-    ip_address = socket.gethostbyname(hostname)
-    print (ip_address)
     
-  
+    # Charge système (moyenne sur 1, 5, 15 min)
+    try:
+        load_avg = os.getloadavg()
+        system_load = f"{load_avg[0]:.2f}, {load_avg[1]:.2f}, {load_avg[2]:.2f}"
+    except (AttributeError, OSError):
+        system_load = "N/A (non disponible sur Windows)"
     
+    # Adresse IP
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("8.8.8.8", 80))
+        ip_address = s.getsockname()[0]
+        s.close()
+    except Exception:
+        ip_address = "Non disponible"
     
     return {
         'name_pc': hostname,
