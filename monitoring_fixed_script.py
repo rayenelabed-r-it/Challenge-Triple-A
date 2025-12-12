@@ -1,20 +1,20 @@
-import time
-import psutil
-import platform
-import socket
-from datetime import datetime
-import os
-from collections import defaultdict
+import time # Pour gérer les pauses et le timing
+import psutil # bibliothèque pour récupérer les infos système (CPU, RAM, processus)
+import platform # pour obtenir des informations sur le système d'exploitation
+import socket# Pour récupérer le nom d'hôte et l'adresse IP
+from datetime import datetime # pour gérer les dates et heures
+import os # pour interagir avec le système de fichiers
+from collections import defaultdict # dictionnaire avec valeurs par défaut
 
 
 def get_cpu_info():
     #Récupère les informations sur le processeur
-    cpu_count = psutil.cpu_count(logical=False)
-    cpu_freq = psutil.cpu_freq()
-    cpu_percent = psutil.cpu_percent(interval=1)
+    cpu_count = psutil.cpu_count(logical=False)# récupérer le nombre de cœurs physiques (logical=False exclut les coeur virtuels)
+    cpu_freq = psutil.cpu_freq()   # récupérer la fréquence actuelle du processeur
+    cpu_percent = psutil.cpu_percent(interval=1)  # mesurer l'utilisation du CPU pendant 1 seconde
     
     return {
-        'cpu_count': cpu_count or 'N/A',
+        'cpu_count': cpu_count or 'N/A',   # si None, afficher 'N/A'
         'frequency': f"{cpu_freq.current:.2f} MHz" if cpu_freq else 'N/A',
         'cpu_percent': f"{cpu_percent}",  # Juste le nombre sans %
         'cpu_percent_display': f"{cpu_percent}%"  # Avec % pour l'affichage
@@ -26,24 +26,26 @@ def get_memory_info():
     mem = psutil.virtual_memory()
     
     return {
-        'total_memory': f"{mem.total / (1024**3):.2f} GB",
+        'total_memory': f"{mem.total / (1024**3):.2f} GB",# Conversion octets -> GB
         'used_memory': f"{mem.used / (1024**3):.2f} GB",
-        'ram_percentage': f"{mem.percent:.1f}"
+        'ram_percentage': f"{mem.percent:.1f}"# Pourcentage avec 1 décimale
     }
 
 
 def get_system_info():
-    #Récupère les informations système générales
+    #récupère les informations système générales
     hostname = socket.gethostname()
     system = platform.system()
     if system == "Linux":
-        # Essayer de récupérer la distribution Linux
+        # essayer de récupérer la distribution Linux
         os_info = None
         if 'distro' in dir():
             import distro
             os_info = f"{distro.name()} {distro.version()}"
         else:
             if hasattr(platform, 'freedesktop_os_release'):
+                # hasattr() est une fonction Python intégrée qui vérifie si un objet possède un attribut spécifique.
+                #getloadavg() existe seulement sur Linux/Unix
                 os_name = platform.freedesktop_os_release()
                 os_info = f"{os_name.get('NAME', 'Linux')} {os_name.get('VERSION', platform.release())}"
         
@@ -52,7 +54,7 @@ def get_system_info():
     else:
         os_info = f"{system} {platform.release()}"
     
-    # Calcul de l'uptime
+    # calcul de l'uptime
     boot_time = datetime.fromtimestamp(psutil.boot_time())
     uptime = datetime.now() - boot_time
     days = uptime.days
@@ -88,48 +90,59 @@ def get_system_info():
 
 
 def get_process_info():
-    #Récupère les informations sur les processus
+    #récupère les informations sur les processus
     processes = []
     
     # Collecter les informations des processus
-    for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']):
-        if proc.is_running():
-            processes.append(proc.info)
+    for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']): 
+         # psutil.process_iter() itère sur tous les processus actifs 
+         # Vérifier que le processus est toujours en cours d'exécution
+        
+        if proc.is_running(): 
+            processes.append(proc.info) 
+        # proc.info contient un dictionnaire avec les infos demandées
     
-    # Trier par utilisation CPU et prendre le top 3
-    processes_by_cpu = sorted(
+    # trier par utilisation CPU et prendre le top 3
+    processes_by_cpu = sorted( 
         processes, 
-        key=lambda x: x['cpu_percent'] or 0, 
-        reverse=True
+        key=lambda x: x['cpu_percent'] or 0,  #trier selon le cpu_percent
+        reverse=True 
     )
     
-    top_3 = processes_by_cpu[:3]
+    top_3 = processes_by_cpu[:3] 
     top_3_str = "\n".join([
+        # Créer une chaîne de caractères formatée pour l'affichage
+         # "\n".join() : joindre les éléments avec des retours à la ligne
         f"{p['name']} (PID: {p['pid']}) - {p['cpu_percent']:.1f}%"
         for p in top_3
     ])
     
     return {
-        'process_count': len(processes),
-        'top_3_processes': top_3_str
+        'process_count': len(processes),  #nombre total de processus
+        'top_3_processes': top_3_str #top 3
     }
 
 
-def analyze_files(directory_path):
+def analyze_files(directory_path): 
     #Analyse les fichiers dans un dossier
-    if not os.path.exists(directory_path):
+    if not os.path.exists(directory_path): # vérification que le docier existe 
         return {'pourcentage': f"Erreur : dossier '{directory_path}' introuvable"}
     
-    target_extensions = ['.txt', '.py', '.pdf', '.jpg']
+    target_extensions = ['.txt', '.py', '.pdf', '.jpg'] #def des extension a surveiller 
     file_counts = defaultdict(int)
+    # defaultdict(int) : dictionnaire qui retourne 0 si une clé n'existe pas
     total_files = 0
     
     # Parcourir tous les fichiers
-    if os.access(directory_path, os.R_OK):
+    if os.access(directory_path, os.R_OK): # Vérifier si on a les droits de lecture sur le dossier
         for root, dirs, files in os.walk(directory_path):
+            # os.walk() parcourt récursivement tous les sous-dossiers
             for file in files:
                 total_files += 1
-                _, ext = os.path.splitext(file)
+                _, ext = os.path.splitext(file) 
+                # os.path.splitext() divise le nom en (nom, extension)
+                #_ → Jette le nom (on n'en a pas besoin)
+                #ext → Garde l'extension 
                 ext_lower = ext.lower()
                 
                 if ext_lower in target_extensions:
@@ -137,20 +150,20 @@ def analyze_files(directory_path):
     else:
         return {'pourcentage': "Erreur : accès refusé au dossier"}
     
-    # Créer le résumé
+    # créer le résumé
     if total_files == 0:
         return {'pourcentage': "Aucun fichier trouvé"}
     
-    stats = [f"Total: {total_files} fichiers"]
+    stats = [f"Total: {total_files} fichiers"] # Construire une liste de chaînes avec les statistiques
     for ext in target_extensions:
         count = file_counts[ext]
         percentage = (count / total_files * 100) if total_files > 0 else 0
-        if count > 0:
+        if count > 0:  # Ajouter à la liste seulement si au moins 1 fichier trouvé
             stats.append(f"{ext}: {count} ({percentage:.1f}%)")
     
     return {'pourcentage': "\n".join(stats)}
 
-
+#GÉNÉRATION DU FICHIER HTML
 def generate_html(data, template_path, output_path):
     
     #Génère le fichier HTML à partir du template
@@ -159,11 +172,13 @@ def generate_html(data, template_path, output_path):
     if not os.path.exists(template_path):
         print(f"✗ Erreur : le fichier template '{template_path}' est introuvable")
         return False
-    
+        
+    # Vérifier qu'on a les droits de lecture sur le template
     if not os.access(template_path, os.R_OK):
         print(f"✗ Erreur : impossible de lire '{template_path}'")
         return False
-    
+
+    #lecture du tameplate 
     with open(template_path, 'r', encoding='utf-8') as f:
         template_content = f.read()
     
