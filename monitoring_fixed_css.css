@@ -361,3 +361,4 @@ footer p {
 
 :focus:not(:focus-visible) {
     outline: none;
+}
