@@ -1,62 +1,146 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="refresh" content="5">
-    <title>Config machine</title>
+    <meta name="description" content="Monitoring système en temps réel - Informations CPU, RAM, réseau et fichiers">
+    <meta name="keywords" content="monitoring, système, CPU, RAM, performance">
+    <meta name="author" content="Monitoring System">
+    <meta name="theme-color" content="#2c3e50">
+    <title>Monitoring Système - {{name_pc}}</title>
+    <link rel="icon" type="image/webp" href="./image/favicon2.png">
     <link rel="stylesheet" href="monitoring_fixed_css.css">
+    
 </head>
 <body>
-    <header>
-        <h1> configuration PC de {{name_pc}}, {{timestamp}}  </h1>
+    <header role="banner">
+        <h1>
+            <img src="./image/favicon2.png" alt="Logo Site - Monitoring" width="150" height="100">
+            Monitoring PC de {{name_pc}}
+        </h1>
+        <p class="timestamp">Mis à jour : {{timestamp}}</p>
     </header>
-    <main>
-        <section class="Système">
-            <h2>Système</h2>
-            <p>le système d'exploitation : {{name_systeme}}</p>
-            <p>uptime : {{uptime}} </p>
-            <p>nombre utilisateur : {{user_nomber}} </p>
-            <p>charge système moyenne : {{system_load}}</p>
-        </section>
-        <section class="cpu">
-            <h2>le cpu</h2>
- <div class="cpu-gauge" style="--cpu: {{cpu_percent}}">
-    <div class="cpu-gauge-inner">{{cpu_percent}}%</div>
-</div>
 
-            <p>le nombre de coeur : {{cpu_count}}</p>
-            <p>la fréquence : {{frequency}}</p>
-            <p>le pourcentage d'utilisation : {{cpu_percent}} </p>
+    <main role="main">
+        <!-- Section Système -->
+        <section class="systeme" aria-label="Informations système">
+            <header>
+                <h2>
+                    <img src="./image/ordibeau.png" alt="Icône système" width="32" height="32">
+                    Système d'exploitation
+                </h2>
+            </header>
+            <article>
+                <dl>
+                    <dt>Système d'exploitation</dt>
+                    <dd>{{name_systeme}}</dd>
+                    <dt>Uptime</dt>
+                    <dd>{{uptime}}</dd>
+                    <dt>Nombre d'utilisateurs</dt>
+                    <dd>{{user_nomber}}</dd>
+                    <dt>Charge système moyenne</dt>
+                    <dd>{{system_load}}</dd>
+                </dl>
+            </article>
         </section>
-        <section class="Mémoire">
-            <h2>Mémoire</h2>
-            
-            <p>RAM totale : {{total_memory}}</p>
-            <p>RAM utilisée : {{used_memory}}</p>
-            <div class="ram-bar" style="--ram: {{ram_percentage}}">
-    <div class="ram-fill"></div>
-</div>
-<p class="progress-label">{{ram_percentage}}% utilisé</p>
 
+        <!-- Section Processeur -->
+        <section class="cpu" aria-label="Informations processeur">
+            <header>
+                <h2>
+                    <img src="./image/proces.png" alt="Icône processeur" width="32" height="32">
+                    Processeur
+                </h2>
+            </header>
+            <article>
+                <div class="cpu-gauge" style="--cpu: {{cpu_percent}}" role="img" aria-label="Utilisation CPU: {{cpu_percent}}%">
+                    <div class="cpu-gauge-inner">{{cpu_percent}}%</div>
+                </div>
+                <dl>
+                    <dt>Nombre de cœurs</dt>
+                    <dd>{{cpu_count}}</dd>
+                    <dt>Fréquence</dt>
+                    <dd>{{frequency}}</dd>
+                    <dt>Pourcentage d'utilisation</dt>
+                    <dd>{{cpu_percent}}%</dd>
+                </dl>
+            </article>
         </section>
-        <section class="Réseau">
-            <h2>Réseau</h2>
-            <p>Adresse IP : {{ip_address}}</p>
+
+        <!-- Section Mémoire -->
+        <section class="memoire" aria-label="Informations mémoire RAM">
+            <header>
+                <h2>
+                    <img src="./image/hdd.png" alt="Icône mémoire" width="32" height="32">
+                    Mémoire RAM
+                </h2>
+            </header>
+            <article>
+                <dl>
+                    <dt>RAM totale</dt>
+                    <dd>{{total_memory}}</dd>
+                    <dt>RAM utilisée</dt>
+                    <dd>{{used_memory}}</dd>
+                </dl>
+                <div class="ram-bar" style="--ram: {{ram_percentage}}" role="img" aria-label="Utilisation RAM: {{ram_percentage}}%">
+                    <div class="ram-fill"></div>
+                </div>
+                <p class="progress-label">{{ram_percentage}}% utilisé</p>
+            </article>
         </section>
-        <section class="processus">
-            <h2>Processus</h2>
-            <p>Nombre de processus en cours d'exécution : {{process_count}}</p>
-            <p>top 3 des processus par utilisation CPU : {{top_3_processes}}</p>
+
+        <!-- Section Réseau -->
+        <section class="reseau" aria-label="Informations réseau">
+            <header>
+                <h2>
+                    <img src="./image/ordinateur-image-animee-0040.gif" alt="Icône réseau" width="50" height="50">
+                    Réseau
+                </h2>
+            </header>
+            <article>
+                <dl>
+                    <dt>Adresse IP</dt>
+                    <dd>{{ip_address}}</dd>
+                </dl>
+            </article>
         </section>
-        <section class="fichiers">
-            <h2>Fichiers</h2>
-            <p>statistique sur les fichiers:{{pourcentage}}</p>
+
+        <!-- Section Processus -->
+        <section class="processus" aria-label="Informations processus">
+            <header>
+                <h2>
+                    <img src="./image/icons8-engrenage.gif" alt="Icône fichiers" width="32" height="32">
+                    Processus en cours d'exécution
+                </h2>
+            </header>
+            <article>
+                <dl>
+                    <dt>Nombre de processus</dt>
+                    <dd>{{process_count}}</dd>
+                    <dt>Top 3 par utilisation CPU</dt>
+                    <dd><pre>{{top_3_processes}}</pre></dd>
+                </dl>
+            </article>
+        </section>
+
+        <!-- Section Fichiers -->
+        <section class="fichiers" aria-label="Statistiques fichiers">
+            <header>
+                <h2>
+                    <img src="./image/icons8-windows-explorer-48.png" alt="Icône fichiers" width="32" height="32">
+                    Fichiers
+                </h2>
+            </header>
+            <article>
+                <pre>{{pourcentage}}</pre>
+            </article>
         </section>
     </main>
 
-    <footer>
-        <p>Généré le {{timestamp}}</p>
+    <footer role="contentinfo">
+        <p>Page générée automatiquement le <time datetime="{{timestamp}}">{{timestamp}}</time></p>
+        <p><small>Monitoring Système - Mise à jour toutes les 5 secondes</small></p>
     </footer>
 
 </body>
