@@ -1,8 +1,3 @@
-#!/usr/bin/env python3
-"""
-Script de monitoring système avec génération HTML
-Compatible avec le template original utilisant {{placeholders}}
-"""
 import time
 import psutil
 import platform
@@ -13,7 +8,7 @@ from collections import defaultdict
 
 
 def get_cpu_info():
-    """Récupère les informations sur le processeur"""
+    #Récupère les informations sur le processeur
     cpu_count = psutil.cpu_count(logical=False)
     cpu_freq = psutil.cpu_freq()
     cpu_percent = psutil.cpu_percent(interval=1)
@@ -27,7 +22,7 @@ def get_cpu_info():
 
 
 def get_memory_info():
-    """Récupère les informations sur la mémoire"""
+    #Récupère les informations sur la mémoire
     mem = psutil.virtual_memory()
     
     return {
@@ -38,20 +33,22 @@ def get_memory_info():
 
 
 def get_system_info():
-    """Récupère les informations système générales"""
+    #Récupère les informations système générales
     hostname = socket.gethostname()
     system = platform.system()
     if system == "Linux":
         # Essayer de récupérer la distribution Linux
-        try:
+        os_info = None
+        if 'distro' in dir():
             import distro
             os_info = f"{distro.name()} {distro.version()}"
-        except ImportError:
-            try:
+        else:
+            if hasattr(platform, 'freedesktop_os_release'):
                 os_name = platform.freedesktop_os_release()
-                os_info= f"{os_name.get('NAME', 'Linux')} {os_name.get('VERSION', platform.release())}"
-            except:
-                os_info = f"Linux {platform.release()}"
+                os_info = f"{os_name.get('NAME', 'Linux')} {os_name.get('VERSION', platform.release())}"
+        
+        if not os_info:
+            os_info = f"Linux {platform.release()}"
     else:
         os_info = f"{system} {platform.release()}"
     
@@ -68,16 +65,16 @@ def get_system_info():
     user_count = len(users)
     
     # Charge système (moyenne sur 1, 5, 15 min)
-    try:
+    if hasattr(os, 'getloadavg'):
         load_avg = os.getloadavg()
         system_load = f"{load_avg[0]:.2f}, {load_avg[1]:.2f}, {load_avg[2]:.2f}"
-    except (AttributeError, OSError):
+    else:
         system_load = "N/A (non disponible sur Windows)"
     
     # Adresse IP
-    try:
-        ip_address = socket.gethostbyname(hostname)
-    except Exception:
+    if hostname:
+        ip_address = socket.gethostbyname(hostname) if hostname else "Non disponible"
+    else:
         ip_address = "Non disponible"
     
     return {
@@ -91,15 +88,13 @@ def get_system_info():
 
 
 def get_process_info():
-    """Récupère les informations sur les processus"""
+    #Récupère les informations sur les processus
     processes = []
     
     # Collecter les informations des processus
     for proc in psutil.process_iter(['pid', 'name', 'cpu_percent']):
-        try:
+        if proc.is_running():
             processes.append(proc.info)
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            pass
     
     # Trier par utilisation CPU et prendre le top 3
     processes_by_cpu = sorted(
@@ -121,7 +116,7 @@ def get_process_info():
 
 
 def analyze_files(directory_path):
-    """Analyse les fichiers dans un dossier"""
+    #Analyse les fichiers dans un dossier
     if not os.path.exists(directory_path):
         return {'pourcentage': f"Erreur : dossier '{directory_path}' introuvable"}
     
@@ -130,7 +125,7 @@ def analyze_files(directory_path):
     total_files = 0
     
     # Parcourir tous les fichiers
-    try:
+    if os.access(directory_path, os.R_OK):
         for root, dirs, files in os.walk(directory_path):
             for file in files:
                 total_files += 1
@@ -139,7 +134,7 @@ def analyze_files(directory_path):
                 
                 if ext_lower in target_extensions:
                     file_counts[ext_lower] += 1
-    except PermissionError:
+    else:
         return {'pourcentage': "Erreur : accès refusé au dossier"}
     
     # Créer le résumé
@@ -157,34 +152,35 @@ def analyze_files(directory_path):
 
 
 def generate_html(data, template_path, output_path):
-    """
-    Génère le fichier HTML à partir du template
-    Remplace les {{variable}} par les valeurs collectées
-    """
-    try:
-        with open(template_path, 'r', encoding='utf-8') as f:
-            template_content = f.read()
-        
-        # Remplacer chaque {{variable}} par sa valeur
-        for key, value in data.items():
-            placeholder = f"{{{{{key}}}}}"
-            template_content = template_content.replace(placeholder, str(value))
-        
-        # Écrire le fichier HTML final
-        with open(output_path, 'w', encoding='utf-8') as f:
-            f.write(template_content)
-        
-        return True
-    except FileNotFoundError:
+    
+    #Génère le fichier HTML à partir du template
+    #Remplace les {{variable}} par les valeurs collectées
+
+    if not os.path.exists(template_path):
         print(f"✗ Erreur : le fichier template '{template_path}' est introuvable")
         return False
-    except Exception as e:
-        print(f"✗ Erreur lors de la génération HTML : {e}")
+    
+    if not os.access(template_path, os.R_OK):
+        print(f"✗ Erreur : impossible de lire '{template_path}'")
         return False
+    
+    with open(template_path, 'r', encoding='utf-8') as f:
+        template_content = f.read()
+    
+    # Remplacer chaque {{variable}} par sa valeur
+    for key, value in data.items():
+        placeholder = f"{{{{{key}}}}}"
+        template_content = template_content.replace(placeholder, str(value))
+    
+    # Écrire le fichier HTML final
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write(template_content)
+    
+    return True
 
 
 def main():
-    """Fonction principale qui génère le monitoring en boucle"""
+    #Fonction principale qui génère le monitoring en boucle
     print("\n" + "="*60)
     print(" MONITORING SYSTÈME EN TEMPS RÉEL ".center(60, "="))
     print("="*60)
@@ -218,22 +214,14 @@ def main():
         
         # Générer le HTML
         if generate_html(data, template_path, output_path):
-            print(f"  ✓ Page mise à jour : CPU {data['cpu_percent_display']}, RAM {data['ram_percentage']}%")
+            print(f"   Page mise à jour : CPU {data['cpu_percent_display']}, RAM {data['ram_percentage']}%")
         else:
-            print(f"  ✗ Erreur lors de la génération")
+            print(f"   Erreur lors de la génération")
         
         # Attendre 5 secondes avant la prochaine mise à jour
         time.sleep(5)
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\n\n" + "="*60)
-        print(" MONITORING ARRÊTÉ ".center(60, "="))
-        print("="*60 + "\n")
-    except Exception as e:
-        print(f"\nErreur inattendue : {e}")
-        import traceback
-        traceback.print_exc()
+    main()
+
